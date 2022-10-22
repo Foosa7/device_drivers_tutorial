@@ -1,3 +1,2 @@
-# device_drivers_tutorial
+# Device drivers in C and C++
 
-Writing device drivers
