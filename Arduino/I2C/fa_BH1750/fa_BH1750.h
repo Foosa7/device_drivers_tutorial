@@ -1,10 +1,9 @@
-/*  
- * Description: This is a library for the light sensor BH1750
- * Datasheet: https://www.mouser.com/datasheet/2/348/bh1750fvi-e-186247.pdf
- * Donwnload: https://github.com/Starmbi/hp_BH1750
- * Wiki: https://github.com/Starmbi/hp_BH1750/wiki
- * Copyright (c) Stefan Amrborst, 2020, Foosa Ace, 2022
- */  
+//********************************************************************************************
+// Description: This is a library for the light sensor BH1750
+// Datasheet: https://www.mouser.com/datasheet/2/348/bh1750fvi-e-186247.pdf
+// Donwnload: https://github.com/Starmbi/hp_BH1750
+// Wiki: https://github.com/Starmbi/hp_BH1750/wiki
+// Copyright (c) Stefan Amrborst, 2020; Foosa Ace, 2022  
 
 #ifndef fa_BH1750_h
 #define fa_BH1750_h
