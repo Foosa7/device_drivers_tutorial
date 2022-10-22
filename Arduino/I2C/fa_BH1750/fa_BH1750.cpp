@@ -2,7 +2,7 @@
 // Description: This is a library for the light sensor BH1750
 // Datasheet: https://www.mouser.com/datasheet/2/348/bh1750fvi-e-186247.pdf
 // Donwnload: https://github.com/Starmbi/fa_BH1750
-// Help and infos are provided at https://github.com/Starmbi/fa_BH1750/wiki
+// Wiki: https://github.com/Starmbi/fa_BH1750/wiki
 // Copyright (c) Stefan Amrborst, 2020; Foosa Ace, 2022
 
 #include <fa_BH1750.h>
@@ -39,12 +39,42 @@ bool fa_BH1750::begin(byte address, TwoWire *myWire)
   _timing.mtregHigh_qualityLow = 89;
   return writeMtreg(BH1750_MTREG_DEFAULT); // Set standard sensitivity
 }
-//********************************************************************************************
-// Returns the current quality  BH1750_QUALITY_HIGH = 0x20, BH1750_QUALITY_HIGH2 = 0x21, BH1750_QUALITY_LOW = 0x23
 
-BH1750Quality fa_BH1750::getQuality() const
+//********************************************************************************************
+// Private function. Sends command to sensor
+
+bool fa_BH1750::writeByte(byte b)
 {
-  return _quality;
+  _wire->beginTransmission(_address);
+  _wire->write(b);
+  return (_wire->endTransmission() == 0);
+}
+
+//********************************************************************************************
+// Private function that reads the value physically
+
+unsigned int fa_BH1750::readValue()
+{
+  byte buff[2];
+  unsigned int req = _wire->requestFrom((int)_address, (int)2); // request two bytes
+  if (req < 2 || _wire->available() < 2)
+  {
+    _time = 999;
+    _value = 0;
+    return _value; // Sensor not found or other problem
+  }
+
+  buff[0] = _wire->read(); // Receive one byte
+  buff[1] = _wire->read(); // Receive one byte
+  _nReads++; // Inc the physically count of reads
+  _value = ((buff[0] << 8) | buff[1]);
+
+  unsigned long mil = millis();
+  if (_value > 0 && _time == 0)
+    _time = mil - _startMillis; // Conversion time
+  if (mil >= (_timeoutMillis) && (_time == 0))
+    _time = mil - _startMillis;
+  return _value;
 }
 
 //********************************************************************************************
@@ -64,6 +94,15 @@ bool fa_BH1750::powerOff()
   return writeByte(0x0);
 }
 
+
+//********************************************************************************************
+// Returns the current quality  BH1750_QUALITY_HIGH = 0x20, BH1750_QUALITY_HIGH2 = 0x21, BH1750_QUALITY_LOW = 0x23
+
+BH1750Quality fa_BH1750::getQuality() const
+{
+  return _quality;
+}
+
 //********************************************************************************************
 // This sets the previous measurement result to zero (0)
 // Is only working after powerOn command (already included in this function)
@@ -73,16 +112,6 @@ bool fa_BH1750::reset()
   if (powerOn() == false)
     return false;
   return writeByte(0x7);
-}
-
-//********************************************************************************************
-// Private function. Sends command to sensor
-
-bool fa_BH1750::writeByte(byte b)
-{
-  _wire->beginTransmission(_address);
-  _wire->write(b);
-  return (_wire->endTransmission() == 0);
 }
 
 //********************************************************************************************
@@ -413,33 +442,6 @@ unsigned int fa_BH1750::getRaw()
 bool fa_BH1750::processed() const
 {
   return _processed;
-}
-
-//********************************************************************************************
-// Private function that reads the value physically
-
-unsigned int fa_BH1750::readValue()
-{
-  byte buff[2];
-  unsigned int req = _wire->requestFrom((int)_address, (int)2); // request two bytes
-  if (req < 2 || _wire->available() < 2)
-  {
-    _time = 999;
-    _value = 0;
-    return _value; // Sensor not found or other problem
-  }
-
-  buff[0] = _wire->read(); // Receive one byte
-  buff[1] = _wire->read(); // Receive one byte
-  _nReads++; // Inc the physically count of reads
-  _value = ((buff[0] << 8) | buff[1]);
-
-  unsigned long mil = millis();
-  if (_value > 0 && _time == 0)
-    _time = mil - _startMillis; // Conversion time
-  if (mil >= (_timeoutMillis) && (_time == 0))
-    _time = mil - _startMillis;
-  return _value;
 }
 
 //********************************************************************************************
