@@ -2,7 +2,7 @@
 # BMP280 Arduino Library
 
 ## Datasheet
-1. BMP280[https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bmp280-ds001.pdf]
+1. [BMP280](https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bmp280-ds001.pdf)
 
 ## Measurements
 #### Pressure: 3.3.1
